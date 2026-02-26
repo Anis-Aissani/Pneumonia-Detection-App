@@ -1,0 +1,13 @@
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+scikit-image==0.22.0
+scikit-learn==1.5.0
+numpy==1.26.4
+Pillow==10.3.0
+opencv-python-headless==4.9.0.80
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==3.2.2
+pytest==8.2.0
+httpx==0.27.0

@@ -1,0 +1,47 @@
+version: "3.8"
+
+# PneumoScan AI — Orchestration des services
+#
+# Services :
+#   backend  — API FastAPI (port 8000)
+#   frontend — Interface Vue.js servie par Nginx (port 80)
+#
+# Volumes persistants :
+#   ./data      — base de données SQLite (predictions.db)
+#   ./heatmaps  — cartes d'attention HOG générées
+#   ./backend/model — modèle HOG+SVM pré-entraîné
+
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pneumoscan-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./heatmaps:/app/heatmaps
+      - ./backend/model:/app/model:ro   # Lecture seule : le modèle ne doit pas être modifié
+    environment:
+      - DB_PATH=/app/data/predictions.db
+      - HEATMAP_DIR=/app/heatmaps
+      - MODEL_PATH=/app/model/pneumonia_hog_model.pkl
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pneumoscan-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

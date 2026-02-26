@@ -1,0 +1,70 @@
+# =========================
+# PYTHON CORE
+# =========================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# =========================
+# VIRTUAL ENVIRONMENTS
+# =========================
+venv/
+env/
+ENV/
+.venv/
+.env_venv/
+
+# =========================
+# SECRETS & CONFIG (CRITICAL)
+# =========================
+.env
+.env.local
+*.env
+secret_keys.py
+
+# =========================
+# DATA & MACHINE LEARNING
+# =========================
+# Ignore raw data and datasets (Add sample images manually if needed)
+data/
+datasets/
+raw_data/
+processed_data/
+*.csv
+*.dat
+*.sqlite3
+*.db
+
+# Ignore heavy trained models (GitHub 100MB limit)
+*.h5
+*.hdf5
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.onnx
+models/
+saved_models/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# =========================
+# WEB FRAMEWORKS (FLASK)
+# =========================
+instance/
+.webassets-cache
+flask_session/
+
+# =========================
+# IDE & OS FILES
+# =========================
+# VS Code
+.vscode/
+*.code-workspace
+
+# macOS / Windows junk files
+.DS_Store
+Thumbs.db
