@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PneumoScan AI v2</title>
+  <title>PneumoScan</title>
 
   <!--
     Dépendances externes (chargées via CDN pour simplifier le déploiement) :
@@ -290,17 +290,8 @@
       <div class="login-logo">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         <div>
-          <div style="font-weight:700;font-size:16px">PneumoScan AI</div>
-          <div style="font-size:11px;color:#718096">v2.0 — Accès sécurisé</div>
-        </div>
-      </div>
-
-      <!-- Comptes de démonstration -->
-      <div class="alert info" style="margin-bottom:16px;font-size:12px">
-        <div>
-          <strong>Comptes de démonstration :</strong><br>
-          Radiologue : <code>radiologist</code> / <code>radio123</code><br>
-          Admin : <code>admin</code> / <code>admin123</code>
+          <div style="font-weight:700;font-size:16px">PneumoScan</div>
+          <div style="font-size:11px;color:#718096">Triage radiologique</div>
         </div>
       </div>
 
@@ -330,10 +321,10 @@
     <header class="topbar">
       <div class="topbar-logo">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-        PneumoScan AI
+        PneumoScan
       </div>
       <div class="topbar-divider"></div>
-      <span class="topbar-sub">Aide au diagnostic de pneumonie</span>
+      <span class="topbar-sub">Triage radiologique assisté</span>
       <div class="topbar-right">
         <div class="topbar-status">
           <div class="dot" :class="apiOk ? 'ok' : 'err'"></div>
@@ -358,7 +349,7 @@
         <div class="sidenav-label" style="margin-top:8px">Administration</div>
         <div class="sidenav-item" :class="{active: page==='dashboard', locked: user.role !== 'admin'}"
           @click="user.role === 'admin' && (page='dashboard', loadDashboard())">
-          📊 Tableau de bord BI
+          📊 Statistiques
           <span v-if="user.role !== 'admin'" style="font-size:10px;margin-left:auto;opacity:.6">Admin</span>
         </div>
         <div class="sidenav-label" style="margin-top:8px">Système</div>
@@ -373,7 +364,7 @@
           <div v-if="page==='analyse'" key="analyse">
             <div class="page-header">
               <div class="page-title">Nouvelle analyse</div>
-              <div class="page-desc">Importez une radiographie thoracique (incidence PA). Une session active est requise.</div>
+              <div class="page-desc">Importez une radiographie thoracique. Une session active est requise.</div>
             </div>
 
             <!-- Ouvrir une session si aucune n'est active -->
@@ -430,7 +421,7 @@
                   <!-- Colonne gauche : image + contrôles -->
                   <div class="card">
                     <div class="card-head">Radiographie importée</div>
-                    <img :src="preview" class="xray-img" alt="Radiographie thoracique"
+                    <img :src="preview" class="xray-img" alt="Radiographie"
                       :style="`filter:brightness(${brightness}%) contrast(${contrast}%)`"/>
                     <div class="img-controls">
                       <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px">Ajustement de l'image</div>
@@ -529,13 +520,13 @@
                   </div>
                 </div>
 
-                <!-- Carte d'attention HOG -->
+                <!-- Zones d'analyse -->
                 <div v-if="result && heatmapUrl" class="card" style="margin-top:20px">
-                  <div class="card-head">Carte d'attention HOG — Zones analysées par le modèle</div>
+                  <div class="card-head">Zones analysées</div>
                   <div class="card-body" style="padding:12px">
-                    <img :src="heatmapUrl" style="width:100%;display:block;border-radius:2px" alt="HOG heatmap"/>
+                    <img :src="heatmapUrl" style="width:100%;display:block;border-radius:2px" alt="Zones analysées"/>
                     <div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center">
-                      Image originale (gauche) · Superposition des gradients HOG (droite)
+                      Image originale (gauche) · Zones contribuant à la prédiction (droite)
                     </div>
                   </div>
                 </div>
@@ -654,7 +645,7 @@
           <!-- ══ PAGE : Tableau de bord BI ═══════════════════════════════════ -->
           <div v-else-if="page==='dashboard'" key="dashboard">
             <div class="page-header">
-              <div class="page-title">Tableau de bord BI</div>
+              <div class="page-title">Statistiques</div>
               <div class="page-desc">Indicateurs de performance du système — réservé à l'administrateur.</div>
             </div>
 
@@ -697,44 +688,47 @@
           <!-- ══ PAGE : À propos ════════════════════════════════════════════ -->
           <div v-else-if="page==='about'" key="about">
             <div class="page-header">
-              <div class="page-title">À propos du système</div>
-              <div class="page-desc">Architecture technique, paramètres du modèle et informations réglementaires.</div>
+              <div class="page-title">À propos</div>
+              <div class="page-desc">Informations sur le système et avertissements d'utilisation.</div>
             </div>
             <div class="about-grid">
-              <div class="card"><div class="card-head">Architecture logicielle</div><div class="card-body">
+              <div class="card"><div class="card-head">Le système</div><div class="card-body">
                 <table class="info-table">
-                  <tr><td>Backend</td><td>FastAPI 0.111 (Python 3.11)</td></tr>
-                  <tr><td>Frontend</td><td>Vue.js 3 + Nginx</td></tr>
-                  <tr><td>Authentification</td><td>JWT (HS256, TTL 8h)</td></tr>
-                  <tr><td>Base de données</td><td>SQLite 3</td></tr>
-                  <tr><td>Conteneurisation</td><td>Docker Compose</td></tr>
-                  <tr><td>Tests unitaires</td><td>pytest (21 tests)</td></tr>
-                  <tr><td>Précision modèle</td><td>~84 % (jeu de test)</td></tr>
+                  <tr><td>Nom</td><td>PneumoScan</td></tr>
+                  <tr><td>Fonction</td><td>Aide au triage radiologique thoracique</td></tr>
+                  <tr><td>Modèle</td><td>HOG + SVM (~84 % de précision)</td></tr>
+                  <tr><td>Formats acceptés</td><td>JPEG, PNG (10 Mo max)</td></tr>
+                  <tr><td>Incidence recommandée</td><td>Radiographie thoracique PA</td></tr>
                 </table>
               </div></div>
-              <div class="card"><div class="card-head">Paramètres HOG</div><div class="card-body">
+              <div class="card"><div class="card-head">Niveaux de triage</div><div class="card-body">
                 <table class="info-table">
-                  <tr><td>Taille d'entrée</td><td>224 × 224 px (niveaux de gris)</td></tr>
-                  <tr><td>Orientations</td><td>4 bins directionnels</td></tr>
-                  <tr><td>Pixels / cellule</td><td>32 × 32 px</td></tr>
-                  <tr><td>Cellules / bloc</td><td>2 × 2</td></tr>
-                  <tr><td>Normalisation</td><td>L2-Hys</td></tr>
-                  <tr><td>Vecteur de features</td><td>576 dimensions</td></tr>
-                  <tr><td>Classifieur</td><td>Pipeline(StandardScaler, SVM-RBF)</td></tr>
+                  <tr>
+                    <td><span class="badge critical">CRITICAL</span></td>
+                    <td>Pneumonie détectée, confiance &gt; 85 % — Revue immédiate</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge moderate">MODERATE</span></td>
+                    <td>Suspicion intermédiaire — Revue prioritaire</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge routine">ROUTINE</span></td>
+                    <td>Faible suspicion ou résultat normal — Revue standard</td>
+                  </tr>
                 </table>
               </div></div>
-              <div class="card" style="grid-column:1/-1"><div class="card-head">Contrôle d'accès (RBAC)</div><div class="card-body">
+              <div class="card" style="grid-column:1/-1"><div class="card-head">Accès et rôles</div><div class="card-body">
                 <table class="info-table">
-                  <tr><td>Rôle <code>radiologist</code></td><td>Création de sessions, analyse, historique, triage</td></tr>
-                  <tr><td>Rôle <code>admin</code></td><td>Tous les droits + tableau de bord BI</td></tr>
-                  <tr><td>Durée token JWT</td><td>8 heures (1 shift hospitalier)</td></tr>
-                  <tr><td>Algorithme</td><td>HMAC-SHA256 (HS256)</td></tr>
+                  <tr><td>Radiologue</td><td>Sessions, analyses, historique, file de triage</td></tr>
+                  <tr><td>Administrateur</td><td>Tous les droits + tableau de bord statistiques</td></tr>
+                  <tr><td>Session de travail</td><td>Durée libre — clôturable manuellement</td></tr>
+                  <tr><td>Anonymisation</td><td>Masquage irréversible des coins de l'image (données PACS)</td></tr>
                 </table>
               </div></div>
             </div>
             <div class="disclaimer">
               <strong>⚠ Avertissement médical</strong><br>
-              PneumoScan AI est un prototype académique développé dans le cadre d'un projet de Licence MIAGE. Il ne constitue pas un dispositif médical certifié (directive 93/42/CEE ou règlement UE 2017/745). Les résultats fournis sont indicatifs et doivent être interprétés par un médecin dans le contexte clinique complet du patient.
+              PneumoScan est un outil d'aide au triage. Il ne constitue pas un dispositif médical certifié et ne remplace pas l'évaluation clinique d'un radiologue qualifié. Les résultats fournis sont indicatifs et doivent être interprétés dans le contexte clinique complet du patient.
             </div>
           </div>
 
@@ -743,8 +737,8 @@
     </div>
 
     <footer class="footer">
-      <span>PneumoScan AI v2.0 — Prototype académique MIAGE</span>
-      <span style="font-family:var(--mono)">API : localhost:8000 &nbsp;·&nbsp; UI : localhost:80</span>
+      <span>PneumoScan</span>
+      <span style="color:var(--muted)">Outil d'aide au triage radiologique — Usage médical uniquement</span>
     </footer>
   </template>
 
@@ -1050,9 +1044,9 @@ createApp({
       doc.rect(0, 0, PAGE_W, H_HEADER, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFont("helvetica", "bold"); doc.setFontSize(12);
-      doc.text("PneumoScan AI", MARGIN, 10);
+      doc.text("PneumoScan", MARGIN, 10);
       doc.setFont("helvetica", "normal"); doc.setFontSize(9);
-      doc.text("Rapport d'Analyse Radiographique — v2.0", MARGIN, 16);
+      doc.text("Rapport d'Analyse Radiographique", MARGIN, 16);
       doc.setFontSize(8);
       doc.text(`ID : ${result.value.id}`, PAGE_W - MARGIN, 10, { align: "right" });
       doc.text(fmt(result.value.timestamp), PAGE_W - MARGIN, 16, { align: "right" });
@@ -1063,7 +1057,7 @@ createApp({
       doc.roundedRect(MARGIN, y, INNER_W, H_WARN - 2, 1.5, 1.5, "FD");
       doc.setFontSize(7.5); doc.setTextColor(146, 64, 14);
       doc.text(
-        "⚠  Ce rapport est un outil d'aide au diagnostic uniquement (prototype académique MIAGE).",
+        "⚠  Ce rapport est un outil d'aide au diagnostic uniquement. Ne remplace pas l'avis d'un radiologue.",
         MARGIN + 3, y + 5
       );
       doc.text(
@@ -1165,7 +1159,7 @@ createApp({
       doc.setDrawColor(208, 215, 222); doc.line(0, footerY, PAGE_W, footerY);
       doc.setFontSize(7); doc.setTextColor(113, 128, 150);
       doc.text(
-        "PneumoScan AI v2.0 — Prototype académique MIAGE | Document confidentiel — Ne pas diffuser",
+        "PneumoScan — Document confidentiel",
         MARGIN, footerY + 5
       );
       doc.text(
