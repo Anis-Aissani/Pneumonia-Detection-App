@@ -1,4 +1,4 @@
-# 🫁 PneumoScan AI — Plateforme de Diagnostic de Pneumonie
+# 🫁 PneumoScan — Plateforme de Diagnostic de Pneumonie
 
 Système d'aide au diagnostic de pneumonie intégrant un modèle HOG dans une architecture logicielle complète.
 
