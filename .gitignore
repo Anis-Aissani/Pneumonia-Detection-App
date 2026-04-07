@@ -126,3 +126,4 @@ incoming_scans/*.tmp
 *.tex
 rapport.tex
 soutenance_beamer.tex
+revision_questions_guide.tex
