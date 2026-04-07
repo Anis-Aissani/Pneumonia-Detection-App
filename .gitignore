@@ -120,3 +120,8 @@ incoming_scans/*.tmp
 *.bak
 *.swp
 *.swo
+
+# =========================
+# PERSONAL REVISION DOCUMENTS
+# =========================
+revision*.tex
