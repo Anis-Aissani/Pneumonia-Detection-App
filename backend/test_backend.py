@@ -1,5 +1,5 @@
 """
-test_backend.py — Suite de tests unitaires pour PneumoScan AI
+test_backend.py — Suite de tests unitaires pour PneumoScan
 Exécution : pytest test_backend.py -v
 
 Organisation :
@@ -45,7 +45,7 @@ def mock_file(content_type: str, filename: str) -> MagicMock:
 
 class TestValidation:
     """
-    Vérifie que validate_image() accepte uniquement les formats JPEG et PNG,
+    Vérifie que validate_image() accepte les formats JPEG, PNG et DICOM,
     en contrôlant à la fois le type MIME et l'extension du fichier.
     """
 
@@ -54,6 +54,9 @@ class TestValidation:
 
     def test_accepte_png(self):
         assert validate_image(mock_file("image/png", "scan.png")) is True
+
+    def test_accepte_dicom(self):
+        assert validate_image(mock_file("application/dicom", "scan.dcm")) is True
 
     def test_rejette_pdf(self):
         assert validate_image(mock_file("application/pdf", "doc.pdf")) is False
@@ -121,7 +124,7 @@ class TestTriageLogic:
     """
     Vérifie les règles de triage clinique définies dans database.py :
       CRITICAL : pneumonie avec probabilité > 85%
-      MODERATE : pneumonie avec probabilité ≤ 85%
+            MODERATE : pneumonie avec probabilité entre 15% et 85%
       ROUTINE  : résultat normal (quelle que soit la probabilité)
     """
 
@@ -133,6 +136,10 @@ class TestTriageLogic:
     def test_pneumonie_confiance_moyenne_est_moderee(self, prob):
         """Le seuil de 0.85 est inclus dans MODERATE (opérateur strict >)."""
         assert compute_triage("PNEUMONIA", prob) == "MODERATE"
+
+    @pytest.mark.parametrize("prob", [0.01, 0.14])
+    def test_pneumonie_faible_confiance_est_routine(self, prob):
+        assert compute_triage("PNEUMONIA", prob) == "ROUTINE"
 
     @pytest.mark.parametrize("prob", [0.01, 0.50, 0.99])
     def test_normal_toujours_routine(self, prob):

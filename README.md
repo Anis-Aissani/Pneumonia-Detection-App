@@ -1,139 +1,127 @@
-# 🫁 PneumoScan — Plateforme de Diagnostic de Pneumonie
+# PneumoScan
 
-Système d'aide au diagnostic de pneumonie intégrant un modèle HOG dans une architecture logicielle complète.
+Plateforme web de triage radiologique pour la détection de pneumonie.
 
----
+PneumoScan intègre une architecture complète:
+- Backend FastAPI (authentification JWT, API REST, traçabilité)
+- Frontend Vue.js (workflow clinique complet)
+- Pipeline IA (mode principal EfficientNet-B0 + SVM, fallback HOG + PCA + SVM)
+- Base SQLite (historique, sessions, statistiques)
+- Déploiement Docker Compose
 
-## 🗂️ Structure du Projet
+## Fonctionnalités principales
 
-```
-pneumonia-platform/
+- Authentification par rôles (`radiologist`, `admin`)
+- Ouverture / clôture de sessions de travail
+- Analyse RX avec score de confiance et niveau de triage
+- Priorisation des cas (`CRITICAL`, `MODERATE`, `ROUTINE`)
+- Visualisation des zones contributives (explicabilité)
+- Historique filtrable + export CSV
+- Tableau de bord administrateur (KPI + graphiques)
+- Génération de rapport PDF
+
+## Aperçu de l'interface
+
+### Connexion
+![Connexion](assets/ui_login.png)
+
+### Nouvelle analyse
+![Nouvelle analyse](assets/ui_analysis_result.png)
+
+### File de triage
+![File de triage](assets/ui_triage_queue.png)
+
+### Historique
+![Historique](assets/ui_history.png)
+
+### Dashboard administrateur
+![Dashboard admin](assets/ui_admin_stats.png)
+
+## Arborescence du dépôt
+
+```text
+.
 ├── backend/
-│   ├── main.py          ← FastAPI app (endpoints /predict, /history, /heatmap)
-│   ├── predictor.py     ← Intégration modèle HOG + génération heatmap
-│   ├── database.py      ← SQLite logging (traçabilité)
-│   ├── scanner.py       ← Module scan automatique /incoming_scans
-│   ├── utils.py         ← Validation fichiers
-│   ├── model/           ← ⚠️ Mettre votre .pkl ici
-│   ├── requirements.txt
-│   └── Dockerfile
+│   ├── main.py
+│   ├── predictor.py
+│   ├── services.py
+│   ├── database.py
+│   ├── auth.py
+│   ├── scanner.py
+│   └── model/
 ├── frontend/
-│   ├── app.py           ← Interface Streamlit
-│   ├── requirements.txt
-│   └── Dockerfile
-├── incoming_scans/      ← Dépôt automatique de radiographies
-├── heatmaps/            ← Heatmaps générées
-├── data/                ← Base SQLite
-└── docker-compose.yml
+│   └── index.html
+├── assets/
+├── heatmaps/
+├── incoming_scans/
+├── data/
+├── docker-compose.yml
+└── Makefile
 ```
 
----
+## Démarrage rapide (Docker)
 
-## 🚀 Démarrage Rapide
-
-### 1. Ajouter votre modèle
-
-Placez le fichier `.pkl` de votre modèle HOG ici :
-
-```
-backend/model/pneumonia_hog_model.pkl
-```
-
-Le modèle doit être un classificateur sklearn (`predict()` + `predict_proba()` ou `decision_function()`).
-
-### 2. Ajuster les paramètres HOG (si nécessaire)
-
-Dans `backend/predictor.py`, vérifiez que ces paramètres correspondent à l'entraînement de votre ami :
-
-```python
-HOG_WIN_SIZE  = (128, 128)   # Taille d'entrée
-HOG_CELL_SIZE = (8, 8)
-HOG_BLOCK_SIZE = (16, 16)
-HOG_NBINS     = 9
-```
-
-### 3. Lancer avec Docker
-
+### 1) Démarrer l'application
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
-| Service  | URL                        |
-|----------|----------------------------|
-| Frontend | http://localhost:8501      |
-| API      | http://localhost:8000      |
-| API Docs | http://localhost:8000/docs |
-
-### 4. Développement local (sans Docker)
-
+Ou via le Makefile:
 ```bash
-# Backend
+make
+```
+
+### 2) Accéder aux services
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| API | http://localhost:8000 |
+| Swagger | http://localhost:8000/docs |
+
+## Développement local (sans Docker)
+
+### Backend
+```bash
 cd backend
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn main:app --reload
-
-# Frontend (autre terminal)
-cd frontend
-pip install -r requirements.txt
-# Changer API_URL dans app.py: "http://localhost:8000"
-streamlit run app.py
 ```
 
----
+### Frontend
+```bash
+cd frontend
+python -m http.server 3000
+```
 
-## 📡 API Endpoints
+## Endpoints API essentiels
 
-| Méthode | Endpoint         | Description                     |
-|---------|------------------|---------------------------------|
-| POST    | `/predict`       | Analyse une radiographie        |
-| GET     | `/history`       | Historique des prédictions      |
-| GET     | `/heatmap/{id}`  | Récupère une heatmap            |
-| GET     | `/health`        | Statut de l'API                 |
-| GET     | `/docs`          | Documentation Swagger auto      |
+| Méthode | Endpoint | Description |
+|---|---|---|
+| POST | `/auth/token` | Connexion et récupération JWT |
+| GET | `/auth/me` | Profil utilisateur courant |
+| POST | `/predict` | Analyse d'une radiographie |
+| GET | `/history` | Historique des analyses |
+| GET | `/dashboard` | KPI admin |
+| GET | `/health` | État du service |
 
-### Exemple `/predict`
+## Exemple d'appel `/predict`
 
 ```bash
-curl -X POST http://localhost:8000/predict \
-  -F "file=@chest_xray.jpg"
+curl -X POST "http://localhost:8000/predict" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -F "file=@chest_xray.png"
 ```
 
-Réponse :
-```json
-{
-  "id": "uuid",
-  "prediction": "PNEUMONIA",
-  "probability": 0.87,
-  "model_version": "1.0.0-HOG",
-  "heatmap_url": "/heatmap/heatmap_xxx.png",
-  "timestamp": "2024-01-15T10:30:00"
-}
-```
+## Notes IA
 
----
+- Mode principal: `EfficientNet-B0 + SVM`
+- Mode fallback: `HOG + PCA + SVM`
+- Vérification OOD avant inférence pour rejeter les images hors distribution
 
-## 🏥 Module Scan Automatique
+## Avertissement médical
 
-Déposez des radiographies dans `incoming_scans/` et le système les traitera automatiquement toutes les 10 secondes. Les fichiers traités sont déplacés dans `incoming_scans/processed/`.
-
----
-
-## 🗃️ Base de Données
-
-Table `predictions` (SQLite par défaut, PostgreSQL possible) :
-
-| Champ          | Type    | Description               |
-|----------------|---------|---------------------------|
-| id             | TEXT PK | UUID unique               |
-| timestamp      | TEXT    | ISO 8601                  |
-| image_name     | TEXT    | Nom du fichier            |
-| prediction     | TEXT    | PNEUMONIA / NORMAL        |
-| probability    | REAL    | Score entre 0 et 1        |
-| model_version  | TEXT    | Version du modèle         |
-| heatmap_path   | TEXT    | Chemin de la heatmap      |
-
----
-
-## ⚠️ Avertissement Médical
-
-Ce système est un **prototype académique** et ne remplace pas un diagnostic médical professionnel.
+Ce projet est un prototype académique d'aide au triage.
+Il ne remplace pas l'évaluation clinique d'un radiologue qualifié.

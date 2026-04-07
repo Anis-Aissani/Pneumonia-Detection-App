@@ -13,4 +13,4 @@ COPY . .
 
 RUN mkdir -p /app/data /app/heatmaps /app/incoming_scans /app/model
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

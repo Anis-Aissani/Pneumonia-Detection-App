@@ -7,6 +7,14 @@ __pycache__/
 *$py.class
 *.so
 
+# Test and coverage caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
 # =========================
 # VIRTUAL ENVIRONMENTS
 # =========================
@@ -36,6 +44,11 @@ processed_data/
 *.dat
 *.sqlite3
 *.db
+
+# Keep optional lightweight placeholders in ignored folders
+!data/.gitkeep
+!incoming_scans/.gitkeep
+!heatmaps/.gitkeep
 
 # Ignore heavy trained models (GitHub 100MB limit)
 *.h5
@@ -68,3 +81,42 @@ flask_session/
 # macOS / Windows junk files
 .DS_Store
 Thumbs.db
+
+# =========================
+# LATEX / REPORT BUILD OUTPUTS
+# =========================
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.glg
+*.glo
+*.gls
+*.ist
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.xdv
+*.pdf
+
+# =========================
+# PROJECT RUNTIME OUTPUTS
+# =========================
+# Generated heatmaps and scanner leftovers
+heatmaps/heatmap_*.png
+incoming_scans/processed/
+incoming_scans/*.tmp
+
+# Local backup/temporary files
+*.bak
+*.swp
+*.swo

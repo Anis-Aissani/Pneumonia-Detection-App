@@ -1,10 +1,8 @@
-version: "3.8"
-
-# PneumoScan AI — Orchestration des services
+# PneumoScan — Orchestration des services
 #
 # Services :
 #   backend  — API FastAPI (port 8000)
-#   frontend — Interface Vue.js servie par Nginx (port 80)
+#   frontend — Interface Vue.js servie par Nginx (publiee sur le port 3000)
 #
 # Volumes persistants :
 #   ./data      — base de données SQLite (predictions.db)
@@ -27,10 +25,10 @@ services:
     environment:
       - DB_PATH=/app/data/predictions.db
       - HEATMAP_DIR=/app/heatmaps
-      - MODEL_PATH=/app/model/pneumonia_hog_model.pkl
+      - MODEL_PATH=/app/model/pneumonia_effnet_svm.pkl
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -42,6 +40,15 @@ services:
     container_name: pneumoscan-frontend
     ports:
       - "3000:80"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "=================================================="
+        echo "PneumoScan frontend available: http://localhost:3000"
+        echo "Open this link in your browser after docker compose up"
+        echo "=================================================="
+        exec nginx -g 'daemon off;'
     depends_on:
       - backend
     restart: unless-stopped

@@ -11,7 +11,7 @@ En production, ils seraient stockés en base de données avec leurs mots de pass
 
 import os
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, TypedDict
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -28,9 +28,19 @@ TOKEN_TTL_MINUTES = 480  # Durée de vie du token = 1 shift hospitalier (8h)
 pwd_context  = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
+
+class UserRecord(TypedDict):
+    """Stored user record used by the in-memory identity provider."""
+
+    username: str
+    full_name: str
+    role: str
+    hashed_password: str
+
+
 # ── Base de données utilisateurs (en mémoire) ─────────────────────────────────
 
-USERS: dict = {
+USERS: dict[str, UserRecord] = {
     "radiologist": {
         "username":        "radiologist",
         "full_name":       "Dr. Martin Dubois",
@@ -60,7 +70,7 @@ class Token(BaseModel):
 
 # ── Fonctions d'authentification ──────────────────────────────────────────────
 
-def authenticate_user(username: str, password: str) -> Optional[dict]:
+def authenticate_user(username: str, password: str) -> Optional[UserRecord]:
     """Vérifie les identifiants et retourne l'utilisateur, ou None si invalide."""
     user = USERS.get(username)
     if user and pwd_context.verify(password, user["hashed_password"]):

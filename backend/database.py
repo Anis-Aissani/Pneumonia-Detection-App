@@ -13,12 +13,17 @@ import os
 import sqlite3
 import uuid
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 DB_PATH = os.getenv("DB_PATH", "/app/data/predictions.db")
+
+
+def utc_iso_now() -> str:
+    """Return an RFC3339 UTC timestamp with explicit timezone marker."""
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 # Seuils de triage clinique (inspirés des protocoles de tri hospitalier)
 TRIAGE_CRITICAL_THRESHOLD = 0.85   # Probabilité > 85% → révision immédiate
@@ -88,8 +93,12 @@ def compute_triage(prediction: str, probability: float) -> str:
       - MODERATE : pneumonie détectée avec confiance intermédiaire
       - ROUTINE  : normal, ou pneumonie avec faible confiance (< 15%)
     """
-    if prediction == "PNEUMONIA" and probability > TRIAGE_CRITICAL_THRESHOLD:
+    if prediction != "PNEUMONIA":
+        return "ROUTINE"
+    if probability > TRIAGE_CRITICAL_THRESHOLD:
         return "CRITICAL"
+    if probability < TRIAGE_ROUTINE_THRESHOLD:
+        return "ROUTINE"
     if prediction == "PNEUMONIA":
         return "MODERATE"
     return "ROUTINE"
@@ -109,7 +118,7 @@ def log_prediction(
 ) -> Dict:
     """Enregistre une prédiction et retourne ses métadonnées."""
     pred_id      = str(uuid.uuid4())
-    timestamp    = datetime.utcnow().isoformat()
+    timestamp    = utc_iso_now()
     triage_level = compute_triage(prediction, probability)
 
     with get_db() as conn:
@@ -179,7 +188,7 @@ def close_stale_sessions(operator: str) -> int:
     Returns:
         Nombre de sessions fermées.
     """
-    closed_at = datetime.utcnow().isoformat()
+    closed_at = utc_iso_now()
     with get_db() as conn:
         cursor = conn.execute(
             "UPDATE sessions SET status='closed', closed_at=? WHERE operator=? AND status='open'",
@@ -197,7 +206,7 @@ def create_session(patient_count: int, operator: str) -> Dict:
 
     session = {
         "id":            str(uuid.uuid4()),
-        "started_at":    datetime.utcnow().isoformat(),
+        "started_at":    utc_iso_now(),
         "patient_count": patient_count,
         "operator":      operator,
         "status":        "open",
@@ -212,7 +221,7 @@ def create_session(patient_count: int, operator: str) -> Dict:
 
 def close_session(session_id: str) -> Dict:
     """Clôture une session et retourne ses données mises à jour."""
-    closed_at = datetime.utcnow().isoformat()
+    closed_at = utc_iso_now()
     with get_db() as conn:
         conn.execute(
             "UPDATE sessions SET status='closed', closed_at=? WHERE id=?",

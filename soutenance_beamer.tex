@@ -1,0 +1,362 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamertemplate{itemize item}{\color{accentB}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{accentC}$\bullet$}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{array}
+\usetikzlibrary{positioning, arrows.meta, shapes.geometric, calc}
+
+% --- Direction visuelle: editorial moderne -----------------------------------
+\definecolor{bgSoft}{HTML}{FFF8EE}
+\definecolor{ink}{HTML}{121212}
+\definecolor{accentA}{HTML}{0B6E4F}
+\definecolor{accentB}{HTML}{D9480F}
+\definecolor{accentC}{HTML}{0059B3}
+\definecolor{muted}{HTML}{5B5B5B}
+\definecolor{cardBg}{HTML}{FFFFFF}
+\definecolor{lineSoft}{HTML}{E9DCC7}
+
+\setbeamercolor{background canvas}{bg=bgSoft}
+\setbeamercolor{normal text}{fg=ink,bg=bgSoft}
+\setbeamercolor{title}{fg=ink}
+\setbeamercolor{frametitle}{fg=ink,bg=bgSoft}
+\setbeamercolor{item}{fg=accentB}
+\setbeamercolor{block title}{fg=white,bg=accentB}
+\setbeamercolor{block body}{fg=ink,bg=cardBg}
+\setbeamercolor{section in toc}{fg=ink}
+\setbeamercolor{subsection in toc}{fg=muted}
+
+\setbeamerfont{title}{series=\bfseries,size=\Huge}
+\setbeamerfont{frametitle}{series=\bfseries,size=\Large}
+\setbeamerfont{subtitle}{series=\mdseries,size=\normalsize}
+\setbeamerfont{block title}{series=\bfseries,size=\normalsize}
+
+% --- Titre de slide avec filet ------------------------------------------------
+\setbeamertemplate{frametitle}{%
+  \vspace{0.2em}
+  \begin{beamercolorbox}[wd=\paperwidth,leftskip=0.9em,rightskip=0.9em]{frametitle}
+    {\usebeamerfont{frametitle}\insertframetitle}
+    \ifx\insertframesubtitle\@empty
+    \else
+      {\vspace{0.15em}\usebeamerfont{subtitle}\color{muted}\insertframesubtitle}
+    \fi
+  \end{beamercolorbox}
+  \vspace{-0.3em}
+  \begin{tikzpicture}
+    \draw[line width=0.8pt, color=lineSoft] (0,0) -- (\paperwidth,0);
+  \end{tikzpicture}
+}
+
+% --- Footer moderne avec progression -----------------------------------------
+\setbeamerfont{footline}{size=\scriptsize}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.78\paperwidth,ht=2.8ex,dp=1.2ex,leftskip=1em]{author in head/foot}%
+      \usebeamerfont{footline}\color{muted}PneumoScan | Soutenance L3
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.22\paperwidth,ht=2.8ex,dp=1.2ex,rightskip=1em plus1fil]{date in head/foot}%
+      \usebeamerfont{footline}\color{muted}\insertframenumber/\inserttotalframenumber
+    \end{beamercolorbox}%
+  }%
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[accentA] (0,0) rectangle (\paperwidth,0.06);
+  \end{tikzpicture}
+}
+
+\title[PneumoScan]{PneumoScan\\\large Soutenance de Projet Annuel L3 Informatique}
+\author{Anis Aissani}
+\institute{Universite de Rouen Normandie}
+\date{2025--2026}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[accentC!10] (current page.north west) rectangle ([xshift=6cm,yshift=-2.6cm]current page.north west);
+    \fill[accentB!18] ([xshift=-5.3cm,yshift=2.4cm]current page.south east) rectangle (current page.south east);
+    \draw[line width=2.2pt, color=accentA] ([xshift=0.9cm,yshift=-1.2cm]current page.north west) -- ([xshift=7.2cm,yshift=-1.2cm]current page.north west);
+  \end{tikzpicture}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Plan de la soutenance}
+\tableofcontents
+\end{frame}
+
+\begin{frame}{Conducteur cible: 20 minutes}
+\begin{itemize}
+  \item \textbf{2 min} - Contexte, problematique et objectifs.
+  \item \textbf{3 min} - Methodologie UP et repartition des contributions.
+  \item \textbf{4 min} - Architecture technique (frontend, API, ML, BDD, Docker).
+  \item \textbf{8 min} - Demonstration fonctionnelle guidee par les interfaces.
+  \item \textbf{2 min} - Tests, bilan et limites.
+  \item \textbf{1 min} - Perspectives, transition vers questions.
+\end{itemize}
+\vspace{4pt}
+\textbf{Rythme conseille:} environ 50-60 secondes par slide sur la partie implementation.
+\end{frame}
+
+\section{Introduction et contexte}
+
+\begin{frame}{Contexte et motivation}
+\begin{itemize}
+  \item La pneumonie reste une cause majeure de mortalite infectieuse.
+  \item En radiologie, les examens sont souvent traites en FIFO.
+  \item Risque: un cas grave peut attendre trop longtemps.
+  \item Objectif: proposer un outil de triage automatise, explicable et tracable.
+\end{itemize}
+\vspace{4pt}
+\textbf{Positionnement:} prototype academique d'aide a la priorisation, pas un dispositif medical certifie.
+\end{frame}
+
+\begin{frame}{Problematique et objectifs}
+\textbf{Problematique:}
+\begin{itemize}
+  \item Integrer un modele ML pre-entraine dans une architecture web securisee.
+  \item Garantir la tracabilite des analyses et la gestion multi-roles.
+  \item Rejeter les entrees hors distribution (photos, documents non RX).
+\end{itemize}
+\vspace{4pt}
+\textbf{Objectifs techniques:}
+\begin{itemize}
+  \item API FastAPI robuste + interface Vue.js 3.
+  \item Triage automatique \texttt{CRITICAL / MODERATE / ROUTINE}.
+  \item Dashboard BI + generation de rapport PDF.
+\end{itemize}
+\end{frame}
+
+\section{Methodologie et organisation}
+
+\begin{frame}{UP adapte et calendrier}
+\begin{block}{Cadre de conduite}
+Inception (2 sem.) $\rightarrow$ Etude existant, choix stack, repartition binome\\
+Elaboration (4 sem.) $\rightarrow$ UML, schema BDD, maquettes, binome entraine modele\\
+Construction (8 sem.) $\rightarrow$ API FastAPI, Vue.js, integration modele, tests\\
+Transition (2 sem.) $\rightarrow$ Docker, rapport, corrections finales
+\end{block}
+\vspace{4pt}
+\textbf{Message jury:} ce decoupage a aligne rythme logiciel et rythme ML sans deriver du planning.
+\end{frame}
+
+\begin{frame}{Repartition des contributions}
+\begin{columns}[T,onlytextwidth]
+\column{0.49\textwidth}
+\begin{block}{Binome (axe modele)}
+\begin{itemize}
+  \item Entrainement et validation des modeles.
+  \item Comparatifs HOG/LR, ResNet/SVM, EfficientNet/SVM.
+  \item Selection du meilleur compromis robuste.
+\end{itemize}
+\end{block}
+
+\column{0.49\textwidth}
+\begin{block}{Mon axe (application)}
+\begin{itemize}
+  \item API FastAPI, securite JWT/RBAC, base SQLite.
+  \item Interface Vue.js, triage, dashboard, PDF.
+  \item Docker Compose, tests et integration globale.
+\end{itemize}
+\end{block}
+\end{columns}
+\vspace{4pt}
+\textbf{Positionnement personnel:} je travaille sur l'app en m'appuyant sur son modele, tout en maitrisant la vue d'ensemble du pipeline complet.
+\end{frame}
+
+\section{Architecture technique}
+
+\begin{frame}{Vue d'ensemble de l'architecture}
+\centering
+\begin{tikzpicture}[
+  node distance=1.8cm,
+  box/.style={rectangle, draw=ink, rounded corners=3pt, minimum width=3.1cm, minimum height=0.9cm, align=center, fill=white},
+  arr/.style={-{Stealth[length=3pt]}, thick, draw=accentC}
+]
+\node[box] (ui) {Frontend\\Vue.js 3};
+\node[box, right=of ui] (api) {Backend API\\FastAPI};
+\node[box, right=of api] (ml) {Moteur ML\\EfficientNet-B0 + SVM};
+\node[box, below=of api] (db) {SQLite\\Predictions + Sessions};
+
+\draw[arr] (ui) -- node[above]{HTTP/JSON + JWT} (api);
+\draw[arr] (api) -- node[above]{Inference} (ml);
+\draw[arr] (api) -- node[right]{CRUD + KPI} (db);
+\draw[arr] (api) -- ++(0,-1.8) node[below]{Heatmaps + rapports PDF};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Architecture backend en couches}
+\begin{itemize}
+  \item \textbf{Controller layer:} routes FastAPI dans \texttt{main.py}.
+  \item \textbf{Service layer:} orchestration metier dans \texttt{services.py}.
+  \item \textbf{Data layer:} persistance et triage dans \texttt{database.py}.
+  \item \textbf{ML layer:} OOD, inference et heatmap dans \texttt{predictor.py}.
+  \item \textbf{Config layer:} environnement centralise dans \texttt{settings.py}.
+\end{itemize}
+\vspace{4pt}
+\textbf{Resultat:} separation claire des responsabilites, code plus lisible et testable.
+\end{frame}
+
+\begin{frame}{Docker Compose: port 3000 explicite}
+\begin{itemize}
+  \item Commande unique de demo: \texttt{docker compose up --build}.
+  \item Interface frontend exposee sur \textbf{http://localhost:3000}.
+  \item API backend exposee sur \texttt{http://localhost:8000}.
+  \item Les logs frontend affichent le lien cliquable \texttt{http://localhost:3000} au demarrage.
+\end{itemize}
+\vspace{3pt}
+\textbf{Point jury:} Docker est le levier d'industrialisation principal du prototype.
+\end{frame}
+
+\section{Implementation et resultats}
+
+\begin{frame}{Choix algorithmiques et triage clinique}
+\begin{itemize}
+  \item Modele retenu: \texttt{EfficientNet-B0 + SVM} (meilleur compromis robustesse/performance).
+  \item Score test binome: \textbf{Accuracy 86.2\%} et \textbf{F1 88.4\%}.
+  \item Fallback technique deploye: \texttt{HOG + PCA + SVM}.
+\end{itemize}
+\[
+\text{CRITICAL} = (\hat{y}=\text{PNEUMONIA}) \land (p > 0.85)
+\]
+\[
+\text{MODERATE} = (\hat{y}=\text{PNEUMONIA}) \land (0.15 \le p \le 0.85)
+\]
+\[
+\text{ROUTINE} = (\hat{y}=\text{NORMAL}) \lor (\hat{y}=\text{PNEUMONIA} \land p < 0.15)
+\]
+\end{frame}
+
+\begin{frame}{Flux interface: connexion et controle de session}
+\begin{columns}[T,onlytextwidth]
+\column{0.50\textwidth}
+\includegraphics[width=\linewidth,height=0.31\textheight,keepaspectratio]{assets/ui_login.png}
+\vspace{4pt}
+
+\includegraphics[width=\linewidth,height=0.31\textheight,keepaspectratio]{assets/ui_new_analysis_no_session.png}
+
+\column{0.48\textwidth}
+\begin{itemize}
+  \item Connexion securisee par \texttt{JWT} et controle des roles.
+  \item Sans session active, le systeme bloque volontairement l'analyse.
+  \item Une session relie les predictions a un shift operateur.
+  \item Gain: tracabilite et auditabilite des actions cliniques.
+\end{itemize}
+\vspace{4pt}
+\textbf{Message oral:} la session est un garde-fou metier, pas juste un detail UX.
+\end{frame}
+
+\begin{frame}{Flux interface: analyse, score et triage}
+\begin{columns}[T,onlytextwidth]
+\column{0.62\textwidth}
+\includegraphics[width=\linewidth,height=0.68\textheight,keepaspectratio]{assets/ui_analysis_result.png}
+
+\column{0.36\textwidth}
+\begin{itemize}
+  \item Upload RX + ajustement image.
+  \item Lancement inference puis retour \texttt{label + score + triage}.
+  \item Cas \texttt{CRITICAL} mis en evidence immediatement.
+  \item Trace complete: identifiant, horodatage, operateur, modele.
+\end{itemize}
+\vspace{4pt}
+\textbf{Valeur clinique:} priorisation instantanee de la lecture.
+\end{columns}
+\end{frame}
+
+\begin{frame}{Flux interface: explicabilite visuelle et preuve PDF}
+\begin{columns}[T,onlytextwidth]
+\column{0.58\textwidth}
+\includegraphics[width=\linewidth,height=0.33\textheight,keepaspectratio]{assets/ui_analyzed_zones.png}
+\vspace{4pt}
+
+\includegraphics[width=\linewidth,height=0.31\textheight,keepaspectratio]{assets/ui_pdf_report.png}
+
+\column{0.40\textwidth}
+\begin{itemize}
+  \item Vue ``zones analysees'': image originale vs gradients contributifs.
+  \item Support d'explication du resultat devant un encadrant ou un jury.
+  \item Rapport PDF exportable: resultat, triage, images et avertissement medical.
+  \item Le document sert de trace partageable hors application.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Flux interface: file de triage et historique}
+\begin{columns}[T,onlytextwidth]
+\column{0.56\textwidth}
+\includegraphics[width=\linewidth,height=0.66\textheight,keepaspectratio]{assets/ui_triage_queue.png}
+
+\column{0.42\textwidth}
+\includegraphics[width=\linewidth,height=0.30\textheight,keepaspectratio]{assets/ui_history.png}
+\vspace{4pt}
+\begin{itemize}
+  \item Triage en 3 colonnes: \texttt{CRITICAL / MODERATE / ROUTINE}.
+  \item Regle de priorisation explicite et lisible.
+  \item Historique filtrable (dates, triage) + export CSV.
+  \item Les deux vues ferment la boucle: action immediate + traque a posteriori.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Flux interface: supervision admin et cadre d'utilisation}
+\begin{columns}[T,onlytextwidth]
+\column{0.56\textwidth}
+\includegraphics[width=\linewidth,height=0.33\textheight,keepaspectratio]{assets/ui_admin_stats.png}
+\vspace{4pt}
+
+\includegraphics[width=\linewidth,height=0.30\textheight,keepaspectratio]{assets/ui_about.png}
+
+\column{0.42\textwidth}
+\begin{itemize}
+  \item Dashboard admin: KPIs, tendance quotidienne, repartition du triage.
+  \item Estimation du gain de temps pour le service de radiologie.
+  \item Page ``A propos'': roles, formats supportes, limites et avertissement.
+  \item Positionnement clair: outil d'aide, pas remplacement du radiologue.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Tests et verification}
+\begin{itemize}
+  \item Suite unitaire: \textbf{32 tests}, \textbf{32 passes}.
+  \item Couverture: validation upload, preprocess, HOG, triage, anonymisation.
+  \item Stabilite numerique verifiee (pas de NaN/inf).
+\end{itemize}
+\vspace{4pt}
+\textbf{Resultat:} refactorisation confirmee sans regression sur les composants critiques.
+\end{frame}
+
+\section{Conclusion}
+
+\begin{frame}{Bilan du projet}
+\begin{itemize}
+  \item Objectif atteint: prototype deployable d'aide au triage radiologique.
+  \item Contribution principale: architecture web + securite + tracabilite + UX clinique.
+  \item Collaboration claire: modele (binome) + application/integration (moi).
+\end{itemize}
+\vspace{5pt}
+\textbf{Limite assumee:} outil academique non certifie pour usage clinique autonome.
+\end{frame}
+
+\begin{frame}{Perspectives d'evolution}
+\begin{itemize}
+  \item Renforcement du support DICOM et integration PACS.
+  \item Fine-tuning d'EfficientNet-B0 sur donnees ciblees cliniques.
+  \item Explicabilite avancee (Grad-CAM, SHAP).
+  \item Migration SQLite $\rightarrow$ PostgreSQL pour charge multi-utilisateurs.
+  \item Industrialisation CI/CD et monitoring continu.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Q\&A}
+\centering
+\Huge Questions ?
+\end{frame}
+
+\end{document}
