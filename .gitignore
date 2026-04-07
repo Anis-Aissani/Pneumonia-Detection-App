@@ -124,4 +124,4 @@ incoming_scans/*.tmp
 # =========================
 # PERSONAL REVISION DOCUMENTS
 # =========================
-revision_questions_guide.tex
+*.tex

@@ -43,6 +43,14 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 
+% -- Mode compilation rapide --------------------------------------------------
+% Passer a \quickbuildfalse pour le rendu final complet.
+\newif\ifquickbuild
+\quickbuildfalse
+\ifquickbuild
+  \setkeys{Gin}{draft}
+\fi
+
 % -- Code source --------------------------------------------------------------
 \usepackage{listings}
 \lstset{
@@ -206,12 +214,12 @@
 
     \begin{tabular}{rl}
       \textbf{Étudiant :}      & Anis Aissani \\[3pt]
-      \textbf{Binôme :}        & [Mohammed Elakef Zenagui] \\[3pt]
-      \textbf{Encadrant :}     & [C.Petitjean] \\[3pt]
+      \textbf{Binôme :}        & Mohammed Elakef Zenagui \\[3pt]
+      \textbf{Encadrant :}     & Prof C.Petitjean \\[3pt]
       \textbf{Établissement :} & Université de Rouen Normandie \\[3pt]
       \textbf{Formation :}     & L3 Informatique \\[3pt]
       \textbf{Année :}         & 2025 / 2026 \\[3pt]
-      \textbf{GitHub :}        & \href{https://github.com/Anis-Aissani}{\texttt{github.com/Anis-Aissani}} \\
+      \textbf{GitHub :}        & \href{https://github.com/Anis-Aissani/Pneumonia-Detection-App}{\texttt{github.com/Anis-Aissani/Pneumonia-Detection-App}} \\
     \end{tabular}
 
     \vfill
@@ -381,7 +389,7 @@ Aidoc & Deep Learning & Non & Non (SaaS) & Dispositif médical \\
 Les solutions commerciales sont performantes mais inaccessibles dans un contexte
 académique. PneumoScan se positionne comme un prototype déployable mettant
 l'accent sur la qualité architecturale, la sécurité et la traçabilité.
-
+\newpage
 \section{Méthodologie de Développement}
 
 \subsection{Unified Process (UP)}
@@ -419,7 +427,7 @@ le système :
   \item \textbf{Modèle relationnel :} schéma de la base SQLite avec tables,
         clés primaires, clés étrangères et index.
 \end{itemize}
-
+\newpage
 \section{Plateforme de Développement et Stack Technique}
 
 \subsection{Technologies Utilisées}
@@ -481,7 +489,7 @@ Concaténation (Haralick+HOG+LBP) + LR & 100\% & 100\% & Résultat suspect (risq
 \bottomrule
 \end{tabularx}
 \end{table}
-
+\newpage
 \section{Objectifs et Périmètre de l'Application}
 
 \begin{table}[H]
@@ -634,7 +642,7 @@ Le \textbf{tableau de bord BI} fournit les indicateurs clés de performance :
   \item Répartition par niveau de triage (graphique donut)
   \item Estimation des heures économisées (base : 5 min par analyse)
 \end{itemize}
-
+\newpage
 \subsection{Interfaces de l'application (captures réelles)}
 
 Cette section présente les écrans réellement implémentés dans PneumoScan.
@@ -855,7 +863,7 @@ Le diagramme ci-dessous représente les cas d'utilisation principaux du système
 \end{tikzpicture}
 \caption{Diagramme de cas d'utilisation global}
 \end{figure}
-
+\newpage
 \section{Description des Cas d'Utilisation}
 
 \subsection{Pour les Utilisateurs}
@@ -1181,11 +1189,12 @@ qui constitue la trace formelle de l'analyse.
 
 \subsection{Diagramme de classe}
 
-\begin{figure}[H]
+\begin{figure}[p]
 \centering
 \begin{tikzpicture}[
-  every node/.style={font=\small},
-  class/.style={rectangle, draw, thick, minimum width=4cm, fill=white},
+  every node/.style={font=\normalsize},
+  class/.style={rectangle, draw, thick, rounded corners=2pt, fill=white, inner sep=3pt},
+  rel/.style={thick, -{Stealth[length=4pt]}},
 ]
   % Classe User
   \node[class] (user) at (0, 0) {
@@ -1205,7 +1214,7 @@ qui constitue la trace formelle de l'analyse.
   };
 
   % Classe Session
-  \node[class] (session) at (6, 0) {
+  \node[class] (session) at (9, 0) {
     \begin{tabular}{|l|}
       \hline
       \textbf{Session} \\
@@ -1224,7 +1233,7 @@ qui constitue la trace formelle de l'analyse.
   };
 
   % Classe Prediction
-  \node[class] (pred) at (3, -5) {
+  \node[class] (pred) at (4.5, -8) {
     \begin{tabular}{|l|}
       \hline
       \textbf{Prediction} \\
@@ -1247,12 +1256,13 @@ qui constitue la trace formelle de l'analyse.
   };
 
   % Relations
-  \draw[thick, -{Stealth[length=4pt]}] (user) -- node[above, font=\scriptsize]{crée} (session);
-  \draw[thick, -{Stealth[length=4pt]}] (session) -- node[right, font=\scriptsize]{contient (0..*)} (pred);
-  \draw[thick, -{Stealth[length=4pt]}] (user) -- node[left, font=\scriptsize]{effectue (0..*)} (pred);
+  \draw[rel] (user.east) -- node[above, font=\small]{crée} (session.west);
+  \draw[rel] (session.south west) to[bend left=18] node[right, font=\small]{contient (0..*)} (pred.east);
+  \draw[rel] (user.south east) to[bend right=18] node[left, font=\small]{effectue (0..*)} (pred.west);
 \end{tikzpicture}
 \caption{Diagramme de classes simplifié}
 \end{figure}
+\clearpage
 
 \subsection{Dictionnaire des données}
 
@@ -1709,8 +1719,17 @@ Organisation mondiale de la Santé (OMS).
 World Health Organization, 2022.
 \url{https://www.who.int/news-room/fact-sheets/detail/pneumonia}
 
+\bibitem{binome2026model}
+M.~Elakef Zenagui.
+\textit{Artefact modèle de classification pneumonie utilisé pour l'intégration API de PneumoScan}.
+Google Drive, 2026.
+\url{https://drive.google.com/file/d/1CH2zGzIfj5EJY3V_-bXOqAYCs7CbaPfN/view?usp=sharing}
+
 \end{thebibliography}
 
 \printglossaries
+\ifquickbuild\else
+\printglossaries
+\fi
 
 \end{document}
