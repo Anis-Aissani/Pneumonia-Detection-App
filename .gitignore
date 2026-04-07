@@ -125,5 +125,5 @@ incoming_scans/*.tmp
 # =========================
 *.tex
 rapport.tex
-soutenance_beamer.tex
+slides.tex
 revision_questions_guide.tex
