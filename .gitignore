@@ -106,7 +106,6 @@ Thumbs.db
 *.toc
 *.vrb
 *.xdv
-*.pdf
 
 # =========================
 # PROJECT RUNTIME OUTPUTS
@@ -125,3 +124,5 @@ incoming_scans/*.tmp
 # PERSONAL REVISION DOCUMENTS
 # =========================
 *.tex
+rapport.tex
+soutenance_beamer.tex
